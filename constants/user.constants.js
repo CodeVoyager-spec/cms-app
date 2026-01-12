@@ -5,8 +5,8 @@ const USER_ROLE = {
 };
 
 const USER_STATUS = {
-  ACTIVE: "active",
-  INACTIVE: "inactive",
+  PENDING: "pending",
+  APPROVED: "approved",
   BANNED: "banned",
 };
 
