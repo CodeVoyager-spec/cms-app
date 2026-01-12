@@ -8,6 +8,7 @@ require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/auth.routes");
+const globalErrorHandler = require("./middlewares/errorHandler");
 
 const app = express();
 
@@ -40,6 +41,10 @@ app.use(express.urlencoded({ extended: true }));
  * - /cms/api/v1
  */
 app.use("/cms/api/v1/auth", authRoutes);
+
+
+// Global error handler (must be last)
+app.use(globalErrorHandler);
 
 /**
  * Server Bootstrap Function
