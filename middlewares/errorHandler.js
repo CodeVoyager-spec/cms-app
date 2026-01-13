@@ -1,28 +1,16 @@
-const { ZodError } = require("zod");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const AppError = require("../utils/AppError");
 
 module.exports = (err, req, res, next) => {
   /**
-   * Custom application (AppError)
+   * Custom application errors
    */
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       message: err.message,
-    });
-  }
-
-  /**
-   * Zod request validation errors
-   */
-  if (err instanceof ZodError) {
-    return res.status(400).json({
-      message: "Invalid request data. Please check the input fields.",
-      errors: err.issues.map(({ path, message }) => ({
-        field: path.join("."),
-        message,
-      })),
+      // optional: include extra details if available
+      errors: err.errors || undefined,
     });
   }
 

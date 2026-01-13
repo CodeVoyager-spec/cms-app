@@ -1,3 +1,4 @@
+const { USER_STATUS } = require("../constants/user.constants");
 const User = require("../models/user.model");
 const AppError = require("../utils/AppError");
 const { verifyAccessToken } = require("../utils/jwt");
@@ -29,8 +30,8 @@ exports.isAuthenticate = async (req, res, next) => {
   }
 
   // 6. If user is blocked or inactive
-  if (user.status === "BLOCKED") {
-    return next(new AppError("Your account has been blocked", 403));
+  if (user.status === USER_STATUS.BANNED) {
+    return next(new AppError("Your account has been banned", 403));
   }
 
   // 7. Attach user data to request object
