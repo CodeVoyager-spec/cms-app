@@ -88,7 +88,7 @@ exports.signin = catchAsync(async (req, res) => {
   /**
    * 6. Generate JWT with give TTL
    */
-  const token = signAccessToken({ email: user.email, role: user.role });
+  const token = signAccessToken({ id: user._id });
 
   res.status(200).json({
     success: true,
