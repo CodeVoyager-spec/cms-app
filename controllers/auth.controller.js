@@ -11,12 +11,11 @@ const { signAccessToken } = require("../utils/jwt.utils");
  * - Creates user
  */
 exports.signup = catchAsync(async (req, res) => {
-  const { name, email, password, role } = req.body;
 
   // 1. Check if email is already registered
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ userId: req.body.userId });
   if (existingUser) {
-    throw new AppError("Email is already registered", 400);
+    throw new AppError("User id is already registered", 400);
   }
 
   /**
@@ -25,31 +24,28 @@ exports.signup = catchAsync(async (req, res) => {
    * - READER / others → auto-approved → APPROVED
    */
   const status =
-    role === USER_ROLE.AUTHOR ? USER_STATUS.PENDING : USER_STATUS.APPROVED;
+    req.body.role === USER_ROLE.AUTHOR
+      ? USER_STATUS.PENDING
+      : USER_STATUS.APPROVED;
 
   // 3. Create new user (password hashing handled in model)
   const newUser = await User.create({
-    name,
-    email,
-    password,
-    role,
-    status,
+    ...req.body,
+    status
   });
 
-  // 4. Send response (never send password)
+  // 4. Remove password before sending response
+  const user = newUser.toObject();
+  delete user.password;
+
+  // 5. Send response
   res.status(201).json({
     success: true,
     message: "Your account has been created successfully",
-    user: {
-      id: newUser._id,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-      status: newUser.status,
-      createdAt: newUser.createdAt,
-    },
+    user
   });
 });
+
 
 /**
  * SIGNIN – Login existing user
@@ -58,10 +54,10 @@ exports.signup = catchAsync(async (req, res) => {
  * - Allows login only if APPROVED
  */
 exports.signin = catchAsync(async (req, res) => {
-  const { email, password } = req.body;
+  const { userId, password } = req.body;
 
   // 1. Find user and explicitly include password
-  const user = await User.findOne({ email }).select("+password");
+  const user = await User.findOne({ userId }).select("+password");
 
   // 2. Validate email
   if (!user) {

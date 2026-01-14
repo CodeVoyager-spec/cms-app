@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const AppError = require("../utils/AppError");
 
-module.exports = (err, req, res, next) => {
+const errorHandler = (err, req, res, next) => {
   /**
    * Custom application errors
    */
@@ -67,3 +67,5 @@ module.exports = (err, req, res, next) => {
     message: "Something went wrong on our side. Please try again later.",
   });
 };
+
+module.exports = errorHandler;

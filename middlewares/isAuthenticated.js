@@ -9,7 +9,7 @@ const { verifyAccessToken } = require("../utils/jwt");
  * - Verifies token
  * - Checks if user exists and is active
  */
-exports.isAuthenticate = async (req, res, next) => {
+const isAuthenticated = async (req, res, next) => {
   // 1. Get token from "Authorization: Bearer <token>"
   const token = req.headers.authorization?.split(" ")[1];
 
@@ -22,7 +22,7 @@ exports.isAuthenticate = async (req, res, next) => {
   const { id } = verifyAccessToken(token);
 
   // 4. Find user in database (only required fields)
-  const user = await User.findById(id).select("role status");
+  const user = await User.findById(id).select("-password");
 
   // 5. If user does not exist (deleted account)
   if (!user) {
@@ -40,3 +40,5 @@ exports.isAuthenticate = async (req, res, next) => {
   // 8. Allow request to continue
   next();
 };
+
+module.exports = isAuthenticated;

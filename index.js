@@ -48,8 +48,8 @@ app.use(globalErrorHandler);
 
 /**
  * Server Bootstrap Function
- * - 1. Connect to the database
- * - 2. Start the Express server
+ * - Connect to the database
+ * - Start the Express server
  */
 const startServer = async () => {
   try {

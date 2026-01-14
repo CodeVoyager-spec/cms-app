@@ -4,7 +4,7 @@ const AppError = require("../utils/AppError");
  * Middleware for role-based access control
  * - roles: - Allowed user roles
  */
-exports.authorize = (...roles) => (req, res, next) => {
+const authorize = (...roles) => (req, res, next) => {
     // Check if logged-in user's role is allowed
     if (!roles.includes(req.user.role)) {
       return next(
@@ -15,3 +15,5 @@ exports.authorize = (...roles) => (req, res, next) => {
     // Role allowed → continue
     next();
 };
+
+module.exports = authorize;
