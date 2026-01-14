@@ -6,12 +6,11 @@ const { signAccessToken } = require("../utils/jwt.utils");
 
 /**
  * SIGNUP – Create new user
- * - Checks for existing email
+ * - Checks for existing userId
  * - Assigns status based on role
  * - Creates user
  */
 exports.signup = catchAsync(async (req, res) => {
-
   // 1. Check if email is already registered
   const existingUser = await User.findOne({ userId: req.body.userId });
   if (existingUser) {
@@ -23,29 +22,28 @@ exports.signup = catchAsync(async (req, res) => {
    * - AUTHOR → needs admin approval → PENDING
    * - READER / others → auto-approved → APPROVED
    */
-  const status =
-    req.body.role === USER_ROLE.AUTHOR
-      ? USER_STATUS.PENDING
-      : USER_STATUS.APPROVED;
+
+  let userStatus;
+
+  if (req.body.role === USER_ROLE.AUTHOR) {
+    userStatus = USER_STATUS.PENDING;
+  } else {
+    userStatus = USER_STATUS.APPROVED;
+  }
 
   // 3. Create new user (password hashing handled in model)
   const newUser = await User.create({
     ...req.body,
-    status
+    status: userStatus,
   });
-
-  // 4. Remove password before sending response
-  const user = newUser.toObject();
-  delete user.password;
 
   // 5. Send response
   res.status(201).json({
     success: true,
     message: "Your account has been created successfully",
-    user
+    user: newUser,
   });
 });
-
 
 /**
  * SIGNIN – Login existing user
